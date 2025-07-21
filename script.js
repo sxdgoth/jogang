@@ -52,7 +52,6 @@ const VIEW_CONFIGS = {
 let currentUser = null;
 let currentView = 'front';
 let avatarCache = {};
-let viewBoxCache = {};
 
 // DOM Elements
 const loginForm = document.getElementById('loginForm');
@@ -201,7 +200,35 @@ function calculateOptimalViewBox(svgTexts, view) {
     if (viewBoxes.length > 0 && minX !== Infinity) {
         const totalWidth = maxX - minX;
         const totalHeight = maxY - minY;
-        return `${minX} ${minY} ${totalWidth} ${totalHeight}`;
+        
+        // Add some padding and ensure consistent aspect ratio
+        const padding = 10;
+        const paddedX = minX - padding;
+        const paddedY = minY - padding;
+        const paddedWidth = totalWidth + (padding * 2);
+        const paddedHeight = totalHeight + (padding * 2);
+        
+        // Ensure consistent sizing between views by using a standardized approach
+        const aspectRatio = paddedWidth / paddedHeight;
+        const targetAspectRatio = 0.75; // 3:4 ratio to match container
+        
+        let finalX = paddedX;
+        let finalY = paddedY;
+        let finalWidth = paddedWidth;
+        let finalHeight = paddedHeight;
+        
+        // Adjust to maintain consistent aspect ratio
+        if (aspectRatio > targetAspectRatio) {
+            // Too wide, adjust height
+            finalHeight = finalWidth / targetAspectRatio;
+            finalY = paddedY - (finalHeight - paddedHeight) / 2;
+        } else if (aspectRatio < targetAspectRatio) {
+            // Too tall, adjust width
+            finalWidth = finalHeight * targetAspectRatio;
+            finalX = paddedX - (finalWidth - paddedWidth) / 2;
+        }
+        
+        return `${finalX} ${finalY} ${finalWidth} ${finalHeight}`;
     }
     
     // Fallback to default configuration
@@ -218,14 +245,26 @@ async function loadAvatar(view = 'front') {
         const svgContents = [];
         const svgTexts = [];
         
-        // Load all SVG parts
-        for (const [partName, url] of Object.entries(parts)) {
-            const svgContent = await fetchSVGContent(url);
-            if (svgContent) {
-                svgTexts.push(svgContent);
-                const content = extractSVGContent(svgContent);
-                if (content) {
-                    svgContents.push(content);
+        // Define the correct layering order for avatar parts
+        const layerOrder = [
+            'rightUpperArm', 'rightLowerArm', 'rightHand',  // Right arm behind body
+            'rightUpperLeg', 'rightLowerLeg', 'rightFoot',  // Right leg behind body
+            'coreBody',                                      // Body in middle
+            'leftUpperLeg', 'leftLowerLeg', 'leftFoot',     // Left leg in front of body
+            'leftUpperArm', 'leftLowerArm', 'leftHand',     // Left arm in front of body
+            'head'                                           // Head on top
+        ];
+        
+        // Load SVG parts in the correct order
+        for (const partName of layerOrder) {
+            if (parts[partName]) {
+                const svgContent = await fetchSVGContent(parts[partName]);
+                if (svgContent) {
+                    svgTexts.push(svgContent);
+                    const content = extractSVGContent(svgContent);
+                    if (content) {
+                        svgContents.push(content);
+                    }
                 }
             }
         }
@@ -234,8 +273,9 @@ async function loadAvatar(view = 'front') {
         const config = VIEW_CONFIGS[view];
         
         // Calculate optimal viewBox based on all SVG parts
+        // Always recalculate to ensure consistency between views
         const viewBox = calculateOptimalViewBox(svgTexts, view);
-        console.log(`Using viewBox for ${view} view:`, viewBox);
+        console.log(`Calculated viewBox for ${view} view:`, viewBox);
         
         // Create combined SVG with proper viewBox for the current view
         const combinedSVG = `
@@ -246,7 +286,7 @@ async function loadAvatar(view = 'front') {
                  preserveAspectRatio="xMidYMid meet" 
                  width="${config.width}" 
                  height="${config.height}"
-                 style="max-width: 100%; max-height: 100%;">
+                 style="max-width: 100%; max-height: 100%; display: block; margin: auto;">
                 ${svgContents.join('')}
             </svg>
         `;

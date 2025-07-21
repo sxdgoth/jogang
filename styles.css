@@ -240,12 +240,20 @@ body {
     border: 3px solid rgba(102, 126, 234, 0.2);
     position: relative;
     overflow: hidden;
+    /* Ensure consistent sizing for both views */
+    flex-shrink: 0;
 }
 
 .avatar-display svg {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    display: block;
+    /* Ensure SVG is centered */
+    margin: auto;
+    /* Prevent any scaling issues */
+    max-width: 100%;
+    max-height: 100%;
 }
 
 /* Ensure consistent positioning for both views */
@@ -255,29 +263,19 @@ body {
     height: 100%;
     object-fit: contain;
     display: block;
-    margin: 0 auto;
+    margin: auto;
+    /* Force consistent positioning */
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
 }
 
-/* Additional styling for view transitions */
-.avatar-display.front-view {
-    transform: scaleX(1);
-}
-
-.avatar-display.back-view {
-    transform: scaleX(1);
-}
-
-/* Ensure SVG fills container properly for both views */
-.avatar-display.front-view svg,
-.avatar-display.back-view svg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
+/* Smooth transitions between views */
+.avatar-display.switching {
+    opacity: 0.5;
+    transform: scale(0.95);
+    transition: all 0.3s ease;
 }
 
 .avatar-controls {
