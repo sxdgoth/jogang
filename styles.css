@@ -242,6 +242,12 @@ body {
     overflow: hidden;
     /* Ensure consistent sizing for both views */
     flex-shrink: 0;
+    /* Force consistent container behavior */
+    box-sizing: border-box;
+    min-width: 300px;
+    min-height: 400px;
+    max-width: 300px;
+    max-height: 400px;
 }
 
 .avatar-display svg {
@@ -272,6 +278,9 @@ body {
     /* Ensure identical rendering for both views */
     transform-origin: center center;
     transform-box: fill-box;
+    /* Additional safeguards for consistent rendering */
+    vertical-align: top;
+    box-sizing: border-box;
 }
 
 /* Smooth transitions between views */

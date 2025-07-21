@@ -35,14 +35,15 @@ const AVATAR_PARTS = {
 };
 
 // ViewBox configurations for different views - FIXED to ensure consistency
+// Using the actual viewBox from the SVG files to ensure proper positioning
 const VIEW_CONFIGS = {
     front: {
-        viewBox: "-50 -150 100 200",
+        viewBox: "-40.94377899169922 -146.29818725585938 68.82828521728516 163.4471893310547",
         width: "300",
         height: "400"
     },
     back: {
-        viewBox: "-50 -150 100 200", // Same as front to ensure consistent sizing
+        viewBox: "-40.94377899169922 -146.29818725585938 68.82828521728516 163.4471893310547", // Same as front to ensure consistent sizing
         width: "300",
         height: "400"
     }
@@ -224,6 +225,7 @@ async function loadAvatar(view = 'front') {
         // Use fixed viewBox to ensure consistent sizing between front and back views
         const viewBox = config.viewBox;
         console.log(`Using fixed viewBox for ${view} view:`, viewBox);
+        console.log(`Avatar container dimensions: ${config.width}x${config.height}`);
         
         // Create combined SVG with proper viewBox for the current view
         const combinedSVG = `
