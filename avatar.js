@@ -112,8 +112,24 @@ class AvatarRenderer {
                         svgElement.style.objectFit = 'contain';
 
                         // CONSISTENT TRANSFORM FOR BOTH FRONT AND BACK VIEW
+                        // Detect if this is a head part and apply view-specific scaling
+                        let scaleValue = 0.85;
+
+                        if (part.name === 'head') {
+                            // Check if this is front view head (has internal scale transform)
+                            const hasInternalTransform = svgElement.innerHTML.includes('transform=');
+
+                            if (view === 'front' && hasInternalTransform) {
+                                // Front head already has scale(0.7) internally, so scale up to match back view
+                                scaleValue = 0.85 / 0.7; // Compensate for internal 0.7 scale
+                            } else if (view === 'back') {
+                                // Back head has no internal transform, use standard scaling
+                                scaleValue = 0.85 * 0.7; // Match the front head's effective size
+                            }
+                        }
+
                         // Center the SVG and apply consistent scaling
-                        svgElement.style.transform = 'translate(-50%, -50%) scale(0.85)';
+                        svgElement.style.transform = `translate(-50%, -50%) scale(${scaleValue})`;
                         svgElement.style.transformOrigin = 'center center';
 
                         // Ensure viewBox is preserved for consistent aspect ratio
