@@ -1,4 +1,4 @@
-// Authentication JavaScript
+// Authentication JavaScript for Avatar Metaverse
 
 // Check if user is already logged in on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -13,11 +13,23 @@ if (document.getElementById('loginForm')) {
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const username = document.getElementById('username').value;
+        const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
         
+        if (!username || !password) {
+            showError('Please fill in all fields.');
+            return;
+        }
+        
         if (login(username, password)) {
-            window.location.href = 'home.html';
+            // Add loading effect
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.textContent = 'Entering Metaverse...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 1000);
         } else {
             showError('Invalid username or password. Please try again.');
         }
@@ -29,16 +41,43 @@ if (document.getElementById('registerForm')) {
     document.getElementById('registerForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const username = document.getElementById('reg-username').value;
-        const email = document.getElementById('reg-email').value;
+        const username = document.getElementById('reg-username').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
         const password = document.getElementById('reg-password').value;
         const birthday = document.getElementById('reg-birthday').value;
         
+        // Validation
+        if (!username || !email || !password || !birthday) {
+            showError('Please fill in all fields.');
+            return;
+        }
+        
+        if (!validateEmail(email)) {
+            showError('Please enter a valid email address.');
+            return;
+        }
+        
+        if (!validatePassword(password)) {
+            showError('Password must be at least 6 characters long.');
+            return;
+        }
+        
+        if (!validateAge(birthday)) {
+            showError('You must be at least 13 years old to join.');
+            return;
+        }
+        
         if (register(username, email, password, birthday)) {
-            showSuccess('Account created successfully! Redirecting to login...');
+            showSuccess('Avatar created successfully! Redirecting to login...');
+            
+            // Add loading effect
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.textContent = 'Creating Avatar...';
+            submitBtn.disabled = true;
+            
             setTimeout(() => {
                 window.location.href = 'index.html';
-            }, 2000);
+            }, 2500);
         } else {
             showError('Username already exists. Please choose a different username.');
         }
@@ -63,8 +102,33 @@ function register(username, email, password, birthday) {
         birthday: birthday,
         createdAt: new Date().toISOString(),
         avatar: {
-            created: false,
-            customizations: {}
+            view: 'front', // default view
+            bodyParts: {
+                head: 'front-body-flesh-Head.svg',
+                coreBody: 'front-body-flesh-CoreBody.svg',
+                leftUpperArm: 'front-body-flesh-LeftUpperArm.svg',
+                leftLowerArm: 'front-body-flesh-LeftLowerArm.svg',
+                leftHand: 'front-body-flesh-LeftHand.svg',
+                rightUpperArm: 'front-body-flesh-RightUpperArm.svg',
+                rightLowerArm: 'front-body-flesh-RightLowerArm.svg',
+                rightHand: 'front-body-flesh-RightHand.svg',
+                leftUpperLeg: 'front-body-flesh-LeftUpperLeg.svg',
+                leftLowerLeg: 'front-body-flesh-LeftLowerLeg.svg',
+                leftFoot: 'front-body-flesh-LeftFoot.svg',
+                rightUpperLeg: 'front-body-flesh-RightUpperLeg.svg',
+                rightLowerLeg: 'front-body-flesh-RightLowerLeg.svg',
+                rightFoot: 'front-body-flesh-RightFoot.svg'
+            },
+            customizations: {
+                skinColor: '#FDBCB4',
+                items: []
+            }
+        },
+        stats: {
+            level: 1,
+            friends: 0,
+            items: 0,
+            joinDate: new Date().toISOString()
         }
     };
     
@@ -101,6 +165,19 @@ function isLoggedIn() {
 function getCurrentUser() {
     const userStr = localStorage.getItem('currentUser');
     return userStr ? JSON.parse(userStr) : null;
+}
+
+// Update current user data
+function updateCurrentUser(userData) {
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+    
+    // Also update in users array
+    let users = JSON.parse(localStorage.getItem('avatarUsers') || '[]');
+    const userIndex = users.findIndex(u => u.username === userData.username);
+    if (userIndex !== -1) {
+        users[userIndex] = userData;
+        localStorage.setItem('avatarUsers', JSON.stringify(users));
+    }
 }
 
 // Logout function
@@ -151,7 +228,7 @@ function validatePassword(password) {
 function validateAge(birthday) {
     const today = new Date();
     const birthDate = new Date(birthday);
-    const age = today.getFullYear() - birthDate.getFullYear();
+    let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
     
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
@@ -159,4 +236,18 @@ function validateAge(birthday) {
     }
     
     return age >= 13; // Minimum age requirement
+}
+
+// Calculate age from birthday
+function calculateAge(birthday) {
+    const today = new Date();
+    const birthDate = new Date(birthday);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    
+    return age;
 }

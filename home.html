@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avatar Metaverse - Home</title>
+    <title>Avatar Metaverse - Your World</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="home-page">
     <div class="container">
         <header class="header">
-            <h1>Avatar Metaverse</h1>
+            <h1>🌟 Avatar Metaverse</h1>
             <div class="user-info">
                 <span id="welcome-message">Welcome, User!</span>
                 <button id="logout-btn" class="btn-secondary">Logout</button>
@@ -21,11 +21,14 @@
                 <h2>Your Avatar</h2>
                 <div class="avatar-preview">
                     <div id="avatar-container">
-                        <!-- SVG Avatar will be loaded here -->
-                        <div class="avatar-placeholder">
-                            <p>Avatar template will be displayed here</p>
-                            <p>Please provide your SVG template link</p>
+                        <div class="avatar-loading">
+                            <p>Loading your avatar...</p>
                         </div>
+                    </div>
+                    
+                    <div class="avatar-controls">
+                        <button id="front-view" class="view-btn active">Front View</button>
+                        <button id="back-view" class="view-btn">Back View</button>
                     </div>
                 </div>
                 
@@ -38,17 +41,48 @@
             </div>
             
             <div class="menu-section">
-                <h2>Menu</h2>
+                <h2>Metaverse Menu</h2>
                 <div class="menu-options">
-                    <button class="menu-btn">Customize Avatar</button>
-                    <button class="menu-btn">Explore World</button>
-                    <button class="menu-btn">Friends</button>
-                    <button class="menu-btn">Settings</button>
+                    <button class="menu-btn" data-feature="customize">
+                        <span class="menu-icon">🎨</span>
+                        Customize Avatar
+                    </button>
+                    <button class="menu-btn" data-feature="explore">
+                        <span class="menu-icon">🌍</span>
+                        Explore World
+                    </button>
+                    <button class="menu-btn" data-feature="friends">
+                        <span class="menu-icon">👥</span>
+                        Friends
+                    </button>
+                    <button class="menu-btn" data-feature="settings">
+                        <span class="menu-icon">⚙️</span>
+                        Settings
+                    </button>
+                </div>
+                
+                <div class="stats-section">
+                    <h3>Your Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value">1</span>
+                            <span class="stat-label">Level</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">0</span>
+                            <span class="stat-label">Friends</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">0</span>
+                            <span class="stat-label">Items</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
     
+    <script src="avatar.js"></script>
     <script src="home.js"></script>
 </body>
 </html>
