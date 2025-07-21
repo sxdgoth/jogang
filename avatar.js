@@ -113,6 +113,7 @@ class AvatarRenderer {
                 <div class="avatar-error">
                     <p>❌ Error loading avatar</p>
                     <p>Please try refreshing the page</p>
+                    <button onclick="location.reload()" class="btn-secondary" style="margin-top: 15px;">Refresh</button>
                 </div>
             `;
         }

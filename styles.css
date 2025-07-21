@@ -22,7 +22,7 @@ body {
 }
 
 /* Login & Register Forms */
-.login-form, .register-form {
+.login-form, .register-form, .users-panel {
     background: rgba(255, 255, 255, 0.95);
     padding: 40px;
     border-radius: 20px;
@@ -33,7 +33,11 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.login-form h1, .register-form h1 {
+.users-panel {
+    max-width: 800px;
+}
+
+.login-form h1, .register-form h1, .users-panel h1 {
     text-align: center;
     color: #333;
     margin-bottom: 10px;
@@ -45,7 +49,7 @@ body {
     background-clip: text;
 }
 
-.login-form h2, .register-form h2 {
+.login-form h2, .register-form h2, .users-panel h2 {
     text-align: center;
     color: #666;
     margin-bottom: 35px;
@@ -95,6 +99,9 @@ body {
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
 }
 
 .btn-primary:hover {
@@ -115,12 +122,30 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .btn-secondary:hover {
     background: white;
     border-color: #667eea;
     color: #667eea;
+}
+
+.btn-danger {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
 }
 
 .form-footer {
@@ -138,6 +163,11 @@ body {
 .form-footer a:hover {
     color: #764ba2;
     text-decoration: underline;
+}
+
+.admin-link {
+    font-size: 0.9em;
+    opacity: 0.8;
 }
 
 /* Messages */
@@ -159,6 +189,78 @@ body {
     margin-top: 20px;
     font-weight: 500;
     text-align: center;
+}
+
+/* Users Panel */
+.users-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.users-actions .btn-primary,
+.users-actions .btn-secondary,
+.users-actions .btn-danger {
+    width: auto;
+    padding: 10px 20px;
+    font-size: 14px;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.users-list {
+    margin-bottom: 30px;
+}
+
+.user-card {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border-left: 4px solid #667eea;
+}
+
+.user-card h4 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.user-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.user-info span {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.storage-info {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.storage-info h3 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+#storage-details {
+    font-family: monospace;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e1e5e9;
+    white-space: pre-wrap;
+    font-size: 0.9em;
+    color: #666;
 }
 
 /* Home Page Styles */
@@ -190,13 +292,13 @@ body.home-page {
     font-weight: 700;
 }
 
-.user-info {
+.header .user-info {
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
-.user-info span {
+.header .user-info span {
     color: #333;
     font-weight: 600;
     font-size: 1.1em;
@@ -408,6 +510,17 @@ body.home-page {
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
     }
+    
+    .users-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .users-actions .btn-primary,
+    .users-actions .btn-secondary,
+    .users-actions .btn-danger {
+        width: 200px;
+    }
 }
 
 /* Animations */
@@ -424,17 +537,6 @@ body.home-page {
 
 .avatar-section, .menu-section {
     animation: fadeIn 0.6s ease;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
 }
 
 /* Loading animation */

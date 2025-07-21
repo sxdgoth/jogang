@@ -96,11 +96,13 @@ function register(username, email, password, birthday) {
     
     // Create new user object
     const newUser = {
+        id: Date.now(), // Simple ID generation
         username: username,
         email: email,
         password: password, // In a real app, this should be hashed
         birthday: birthday,
         createdAt: new Date().toISOString(),
+        lastLogin: null,
         avatar: {
             view: 'front', // default view
             bodyParts: {
@@ -136,7 +138,24 @@ function register(username, email, password, birthday) {
     users.push(newUser);
     localStorage.setItem('avatarUsers', JSON.stringify(users));
     
+    // Also save to a separate backup for easy viewing
+    saveUserBackup(newUser);
+    
     return true;
+}
+
+// Save user backup for easy viewing
+function saveUserBackup(user) {
+    const backups = JSON.parse(localStorage.getItem('userBackups') || '[]');
+    backups.push({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        password: user.password,
+        birthday: user.birthday,
+        createdAt: user.createdAt
+    });
+    localStorage.setItem('userBackups', JSON.stringify(backups));
 }
 
 // Login function
@@ -148,6 +167,14 @@ function login(username, password) {
     const user = users.find(u => u.username === username && u.password === password);
     
     if (user) {
+        // Update last login
+        user.lastLogin = new Date().toISOString();
+        
+        // Update user in storage
+        const userIndex = users.findIndex(u => u.id === user.id);
+        users[userIndex] = user;
+        localStorage.setItem('avatarUsers', JSON.stringify(users));
+        
         // Store current user session
         localStorage.setItem('currentUser', JSON.stringify(user));
         return true;
@@ -178,6 +205,47 @@ function updateCurrentUser(userData) {
         users[userIndex] = userData;
         localStorage.setItem('avatarUsers', JSON.stringify(users));
     }
+}
+
+// Get all users (for admin panel)
+function getAllUsers() {
+    return JSON.parse(localStorage.getItem('avatarUsers') || '[]');
+}
+
+// Get user backups (for easy viewing)
+function getUserBackups() {
+    return JSON.parse(localStorage.getItem('userBackups') || '[]');
+}
+
+// Clear all users
+function clearAllUsers() {
+    if (confirm('Are you sure you want to delete ALL users? This cannot be undone!')) {
+        localStorage.removeItem('avatarUsers');
+        localStorage.removeItem('userBackups');
+        localStorage.removeItem('currentUser');
+        return true;
+    }
+    return false;
+}
+
+// Export user data
+function exportUserData() {
+    const users = getAllUsers();
+    const backups = getUserBackups();
+    const data = {
+        users: users,
+        backups: backups,
+        exportDate: new Date().toISOString(),
+        totalUsers: users.length
+    };
+    
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = `avatar-users-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
 }
 
 // Logout function

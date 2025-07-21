@@ -150,6 +150,10 @@ function showSettingsModal() {
                     <label>Email:</label>
                     <span>${user.email}</span>
                 </div>
+                <div class="setting-item">
+                    <label>User ID:</label>
+                    <span>${user.id}</span>
+                </div>
             </div>
             <div class="settings-actions">
                 <button id="save-settings" class="btn-primary">Save Settings</button>
@@ -201,6 +205,9 @@ function saveSettings() {
     
     showNotification('Settings saved successfully!', 'success');
     document.querySelector('.modal-overlay').remove();
+    
+    // Refresh user details display
+    loadUserData();
 }
 
 // Reset avatar
@@ -238,8 +245,15 @@ function resetAvatar() {
         // Refresh avatar display
         initializeAvatar();
         
+        // Update view buttons
+        document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('front-view').classList.add('active');
+        
         showNotification('Avatar reset to default!', 'success');
         document.querySelector('.modal-overlay').remove();
+        
+        // Refresh user details display
+        loadUserData();
     }
 }
 
@@ -414,20 +428,10 @@ additionalStyles.textContent = `
         justify-content: center;
     }
     
-    .btn-danger {
+    .settings-actions .btn-primary,
+    .settings-actions .btn-danger {
+        width: auto;
         padding: 12px 24px;
-        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.2s ease;
-    }
-    
-    .btn-danger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
     }
     
     .notification {
@@ -475,6 +479,17 @@ additionalStyles.textContent = `
     
     .avatar-error p {
         margin: 10px 0;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
     }
 `;
 document.head.appendChild(additionalStyles);

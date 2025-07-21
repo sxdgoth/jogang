@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Metaverse - User Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="users-panel">
+            <h1>👥 User Management</h1>
+            <h2>Registered Users</h2>
+            
+            <div class="users-actions">
+                <button id="refresh-users" class="btn-primary">Refresh Users</button>
+                <button id="export-users" class="btn-secondary">Export Data</button>
+                <button id="clear-users" class="btn-danger">Clear All Users</button>
+                <a href="index.html" class="btn-secondary">Back to Login</a>
+            </div>
+            
+            <div id="users-list" class="users-list">
+                <!-- Users will be loaded here -->
+            </div>
+            
+            <div class="storage-info">
+                <h3>Storage Information</h3>
+                <div id="storage-details"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="auth.js"></script>
+    <script src="users.js"></script>
+</body>
+</html>
