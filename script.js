@@ -201,8 +201,8 @@ function calculateOptimalViewBox(svgTexts, view) {
         const totalWidth = maxX - minX;
         const totalHeight = maxY - minY;
         
-        // Add some padding and ensure consistent aspect ratio
-        const padding = 10;
+        // Use consistent padding for both views
+        const padding = 15;
         const paddedX = minX - padding;
         const paddedY = minY - padding;
         const paddedWidth = totalWidth + (padding * 2);
@@ -217,16 +217,22 @@ function calculateOptimalViewBox(svgTexts, view) {
         let finalWidth = paddedWidth;
         let finalHeight = paddedHeight;
         
-        // Adjust to maintain consistent aspect ratio
+        // Adjust to maintain consistent aspect ratio and centering
         if (aspectRatio > targetAspectRatio) {
-            // Too wide, adjust height
+            // Too wide, adjust height and center vertically
             finalHeight = finalWidth / targetAspectRatio;
             finalY = paddedY - (finalHeight - paddedHeight) / 2;
         } else if (aspectRatio < targetAspectRatio) {
-            // Too tall, adjust width
+            // Too tall, adjust width and center horizontally
             finalWidth = finalHeight * targetAspectRatio;
             finalX = paddedX - (finalWidth - paddedWidth) / 2;
         }
+        
+        // Round values to avoid sub-pixel issues
+        finalX = Math.round(finalX * 10) / 10;
+        finalY = Math.round(finalY * 10) / 10;
+        finalWidth = Math.round(finalWidth * 10) / 10;
+        finalHeight = Math.round(finalHeight * 10) / 10;
         
         return `${finalX} ${finalY} ${finalWidth} ${finalHeight}`;
     }
