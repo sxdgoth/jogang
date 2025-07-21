@@ -1,4 +1,4 @@
-// Avatar System for Metaverse Application with Correct 3-Part Arms
+// Avatar System for Metaverse Application with Correct Arm Layering
 
 class AvatarRenderer {
     constructor() {
@@ -38,11 +38,11 @@ class AvatarRenderer {
         }
     }
 
-    // Get body parts for current view with proper Z-index ordering for 3-part arms
+    // Get body parts for current view with CORRECT arm layering
     getBodyPartsForView(view) {
         const prefix = view === 'front' ? 'front-body-flesh-' : 'back-body-flesh-';
         
-        // Return body parts in proper layering order (bottom to top) with correct 3-part arms
+        // Return body parts in proper layering order with CORRECT ARM POSITIONING
         return [
             // Layer 1 (Bottom) - Feet
             { name: 'leftFoot', file: `${prefix}LeftFoot.svg`, zIndex: 1 },
@@ -52,11 +52,11 @@ class AvatarRenderer {
             { name: 'leftLowerLeg', file: `${prefix}LeftLowerLeg.svg`, zIndex: 2 },
             { name: 'rightLowerLeg', file: `${prefix}RightLowerLeg.svg`, zIndex: 2 },
             
-            // Layer 3 - Upper legs + Left arm (behind body)
+            // Layer 3 - Upper legs + LEFT ARM (UNDER body)
             { name: 'leftUpperLeg', file: `${prefix}LeftUpperLeg.svg`, zIndex: 3 },
             { name: 'rightUpperLeg', file: `${prefix}RightUpperLeg.svg`, zIndex: 3 },
             
-            // Left arm behind body (3 parts)
+            // LEFT ARM UNDER BODY (3 parts) - z-index 3
             { name: 'leftUpperArm', file: `${prefix}LeftUpperArm.svg`, zIndex: 3 },
             { name: 'leftLowerArm', file: `${prefix}LeftLowerArm.svg`, zIndex: 3 },
             { name: 'leftHand', file: `${prefix}LeftHand.svg`, zIndex: 3 },
@@ -64,7 +64,7 @@ class AvatarRenderer {
             // Layer 4 - Core body (main layer)
             { name: 'coreBody', file: `${prefix}CoreBody.svg`, zIndex: 4 },
             
-            // Layer 5 - Right arm (in front of body) (3 parts)
+            // Layer 5 - RIGHT ARM ON TOP OF BODY (3 parts) - z-index 5
             { name: 'rightUpperArm', file: `${prefix}RightUpperArm.svg`, zIndex: 5 },
             { name: 'rightLowerArm', file: `${prefix}RightLowerArm.svg`, zIndex: 5 },
             { name: 'rightHand', file: `${prefix}RightHand.svg`, zIndex: 5 },
@@ -74,7 +74,7 @@ class AvatarRenderer {
         ];
     }
 
-    // Render complete avatar with proper layering and original colors
+    // Render complete avatar with proper layering and consistent scaling
     async renderAvatar(container, view = 'front') {
         if (this.isLoading) {
             console.log('Avatar is already loading, skipping...');
@@ -86,6 +86,7 @@ class AvatarRenderer {
         const bodyParts = this.getBodyPartsForView(view);
         
         console.log(`Starting to render avatar in ${view} view`);
+        console.log('Arm layering: LEFT arm UNDER body (z-index 3), RIGHT arm ON TOP of body (z-index 5)');
         console.log('Body parts to load:', bodyParts.map(p => p.file));
         
         // Show loading with progress
@@ -116,7 +117,7 @@ class AvatarRenderer {
             const svgResults = await Promise.all(svgPromises);
             console.log('All SVG files loaded:', svgResults.length);
 
-            loadingStatus.textContent = 'Assembling avatar with 3-part arms...';
+            loadingStatus.textContent = 'Assembling avatar with correct arm layering...';
 
             // Create the avatar display with proper layering
             const avatarDisplay = document.createElement('div');
@@ -145,7 +146,7 @@ class AvatarRenderer {
                         partContainer.style.zIndex = part.zIndex;
                         partContainer.style.pointerEvents = 'none';
                         
-                        // Style the SVG to preserve original colors
+                        // Style the SVG to preserve original colors and CONSISTENT SCALING
                         const svgElement = partContainer.querySelector('svg');
                         if (svgElement) {
                             svgElement.style.position = 'absolute';
@@ -155,13 +156,25 @@ class AvatarRenderer {
                             svgElement.style.height = '100%';
                             svgElement.style.objectFit = 'contain';
                             
+                            // CONSISTENT SCALING - same for both front and back view
+                            svgElement.style.transform = 'scale(0.9)'; // Consistent scale for both views
+                            svgElement.style.transformOrigin = 'center center';
+                            
                             // Preserve original SVG colors - don't override them
                             svgElement.style.color = 'inherit';
                         }
                         
                         avatarDisplay.appendChild(partContainer);
                         successfulLoads++;
-                        console.log(`Successfully added ${part.file} to avatar with z-index ${part.zIndex}`);
+                        
+                        // Log arm positioning
+                        if (part.name.includes('left') && part.name.includes('Arm') || part.name.includes('leftHand')) {
+                            console.log(`✅ LEFT ARM PART: ${part.file} - UNDER body (z-index ${part.zIndex})`);
+                        } else if (part.name.includes('right') && part.name.includes('Arm') || part.name.includes('rightHand')) {
+                            console.log(`✅ RIGHT ARM PART: ${part.file} - ON TOP of body (z-index ${part.zIndex})`);
+                        } else {
+                            console.log(`✅ Added ${part.file} with z-index ${part.zIndex}`);
+                        }
                     } catch (error) {
                         console.error(`Error processing ${part.file}:`, error);
                     }
@@ -178,7 +191,10 @@ class AvatarRenderer {
                 container.appendChild(avatarDisplay);
                 
                 // DO NOT apply color customizations - preserve original SVG colors
-                console.log('Avatar rendering completed successfully with original colors and 3-part arms');
+                console.log('✅ Avatar rendering completed successfully!');
+                console.log('✅ LEFT arm is UNDER body (z-index 3)');
+                console.log('✅ RIGHT arm is ON TOP of body (z-index 5)');
+                console.log('✅ Consistent scaling applied for both views');
             } else {
                 throw new Error('No body parts could be loaded');
             }
@@ -202,7 +218,7 @@ class AvatarRenderer {
     async switchView(container, view) {
         if (this.currentView === view || this.isLoading) return;
         
-        console.log(`Switching to ${view} view`);
+        console.log(`Switching to ${view} view with consistent scaling`);
         await this.renderAvatar(container, view);
     }
 }
@@ -231,7 +247,9 @@ function initializeAvatar() {
     }
 
     console.log('Initializing avatar for user:', user.username);
-    console.log('Avatar will have 3-part arms: UpperArm + LowerArm + Hand');
+    console.log('✅ LEFT arm will be UNDER body');
+    console.log('✅ RIGHT arm will be ON TOP of body');
+    console.log('✅ Both views will have consistent scaling');
     
     // Render the avatar
     avatarRenderer.renderAvatar(container, user.avatar.view || 'front');

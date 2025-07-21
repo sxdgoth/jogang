@@ -110,11 +110,11 @@ function register(username, email, password, birthday) {
                 head: 'front-body-flesh-Head.svg',
                 // Core body
                 coreBody: 'front-body-flesh-CoreBody.svg',
-                // Left arm (3 parts)
+                // Left arm (3 parts) - UNDER body
                 leftUpperArm: 'front-body-flesh-LeftUpperArm.svg',
                 leftLowerArm: 'front-body-flesh-LeftLowerArm.svg',
                 leftHand: 'front-body-flesh-LeftHand.svg',
-                // Right arm (3 parts)
+                // Right arm (3 parts) - ON TOP of body
                 rightUpperArm: 'front-body-flesh-RightUpperArm.svg',
                 rightLowerArm: 'front-body-flesh-RightLowerArm.svg',
                 rightHand: 'front-body-flesh-RightHand.svg',
