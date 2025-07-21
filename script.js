@@ -34,24 +34,6 @@ const AVATAR_PARTS = {
     }
 };
 
-// ViewBox configurations for different views - FIXED to ensure consistency
-// Using the actual viewBox from the SVG files to ensure proper positioning
-const VIEW_CONFIGS = {
-    front: {
-        viewBox: "-40.94377899169922 -146.29818725585938 68.82828521728516 163.4471893310547// Using the actual viewBox from the SVG files to ensure proper positioning
-const VIEW_CONFIGS = {
-    front: {
-        viewBox: "-40.94377899169922 -146.29818725585938 68.82828521728516 163.4471893310547",
-        width: "300",
-        height: "400"
-    },
-    back: {
-        viewBox: "-40.94377899169922 -146.29818725585938 68.82828521728516 163.4471893310547", // Same as front to ensure consistent sizing
-        width: "300",
-        height: "400"
-    }
-};
-
 // Application State
 let currentUser = null;
 let currentView = 'front';
@@ -157,7 +139,7 @@ async function fetchSVGContent(url) {
     }
 }
 
-function extractSVGContent(svgText) {
+function extractSVGContent(svgText, partName = '') {
     // Extract the content inside the SVG tags
     const parser = new DOMParser();
     const doc = parser.parseFromString(svgText, 'image/svg+xml');
@@ -166,27 +148,10 @@ function extractSVGContent(svgText) {
     if (svgElement) {
         // Get all child elements except the SVG wrapper
         const children = Array.from(svgElement.children);
-        return children.map(child => child.outerHTML).join('');
+        let content = children.map(child => child.outerHTML).join('');
     }
     return '';
 }
-
-function extractSVGViewBox(svgText) {
-    // Extract viewBox from SVG
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(svgText, 'image/svg+xml');
-    const svgElement = doc.querySelector('svg');
-    
-    if (svgElement) {
-        return svgElement.getAttribute('viewBox');
-    }
-    return null;
-}
-
-// Note: We use fixed viewBox values instead of dynamic calculation to ensure
-// consistent sizing and positioning between front and back avatar views.
-// Dynamic calculation can lead to different viewBox values for each view,
-// causing inconsistent avatar sizing when switching between views.
 
 async function loadAvatar(view = 'front') {
     const avatarContainer = document.getElementById('avatarDisplay');
@@ -196,8 +161,48 @@ async function loadAvatar(view = 'front') {
         // Create a combined SVG with all body parts
         const parts = AVATAR_PARTS[view];
         const svgContents = [];
-        const svgTexts = [];
+            
+        // Special handling for head parts to normalize positioning
+        if (partName === 'head') {
+            // Check if content already has the transform wrapper
+            if (content.includes('transform="translate(0, -27) scale(0.7)"')) {
+                // Front head already has the transform, use as-is
+                console.log('Head: Using existing transform (front view)');
+                return content;
+            } else {
+                // Back head doesn't have the transform, add it for consistency
+                console.log('Head: Adding transform for consistency (back view)');
+                content = `<g transform="translate(0, -27) scale(0.7)">${content}</g>`;
+            }
+        }
         
+        return content;
+    }
+    return '';
+}
+
+async function loadAvatar(view = 'front') {
+    const avatarContainer = document.getElementById('avatarDisplay');
+    avatarContainer.classList.add('switching');
+    
+    try {
+        // Create a combined SVG with all body parts
+        const parts = AVATAR_PARTS[view];
+        const svgContents = [];
+        
+        // Define the correct layering order for avatar parts
+        const layerOrder = [
+            'rightUpperArm', 'rightLowerArm', 'rightHand',  // Right arm behind body
+            'rightUpperLeg', 'rightLowerLeg', 'rightFoot',  // Right leg behind body
+            'coreBody',                                      // Body in middle
+            'leftUpperLeg', 'leftLowerLeg', 'leftFoot',     // Left leg in front     of body
+            'leftUpperArm', 'leftLowerArm', 'leftHand',     // Left arm in front of bo, partName);
+                'head'                                               // Head on top
+                        console.log(`Loaded ${partName} for ${view} view`);
+                    }
+        ];
+        
+        // Load SVG parts in the correct order
         // Define the correct layering order for avatar parts
         const layerOrder = [
             'rightUpperArm', 'rightLowerArm', 'rightHand',  // Right arm behind body
@@ -213,41 +218,29 @@ async function loadAvatar(view = 'front') {
             if (parts[partName]) {
                 const svgContent = await fetchSVGContent(parts[partName]);
                 if (svgContent) {
-                    svgTexts.push(svgContent);
                     const content = extractSVGContent(svgContent);
                     if (content) {
                         svgContents.push(content);
-        console.log(`Avatar container dimensions: ${config.width}x${config.height}`);
+                        console.log(`Loaded ${partName} for ${view} view`);
                     }
                 }
             }
         }
         
-        // Get view configuration
-        const config = VIEW_CONFIGS[view];
-
-        // Use fixed viewBox to ensure consistent sizing between front and back views
-        const viewBox = config.viewBox;
-        console.log(`Using fixed viewBox for ${view} view:`, viewBox);
-        
-        // Create combined SVG with proper viewBox for the current view
+        // Create combined SVG
         const combinedSVG = `
             <svg xmlns:xlink="http://www.w3.org/1999/xlink" 
                  xmlns="http://www.w3.org/2000/svg" 
                  aria-label="user avatar" 
-                 viewBox="${viewBox}" 
+                 viewBox="-40.94377899169922 -146.29818725585938 68.82828521728516 163.4471893310547" 
                  preserveAspectRatio="xMidYMid meet" 
-                 width="${config.width}" 
-                 height="${config.height}"
-                 style="max-width: 100%; max-height: 100%; display: block; margin: auto;">
+                 width="300" 
+                 height="400">
                 ${svgContents.join('')}
             </svg>
         `;
         
         avatarContainer.innerHTML = combinedSVG;
-        
-        // Add view-specific class for additional styling if needed
-        avatarContainer.className = `avatar-display ${view}-view`;
         
     } catch (error) {
         console.error('Error loading avatar:', error);
