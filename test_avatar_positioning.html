@@ -60,6 +60,7 @@
     <div class="comparison-note">
         <strong>Test Purpose:</strong> Verify that front and back view avatars have consistent positioning and scaling.
         <br>Both avatars should appear in the same position and size within their containers.
+        <br><strong>Key Fix:</strong> Front head SVG has internal scale(0.7), back head SVG doesn't - now compensated!
     </div>
     
     <div class="test-container">
@@ -84,7 +85,8 @@
     
     <div class="comparison-note">
         <strong>Expected Result:</strong> Both avatars should be centered and scaled identically within their containers.
-        <br><strong>Issue Fixed:</strong> SVG positioning inconsistencies between front and back views.
+        <br><strong>Issue Fixed:</strong> Head size inconsistency - front head had internal scale(0.7), back head didn't.
+        <br><strong>Solution:</strong> Dynamic scaling compensation based on view and internal transforms.
     </div>
 
     <script src="auth.js"></script>
