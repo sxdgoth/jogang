@@ -269,6 +269,9 @@ body {
     top: 0;
     left: 0;
     transform: none;
+    /* Ensure identical rendering for both views */
+    transform-origin: center center;
+    transform-box: fill-box;
 }
 
 /* Smooth transitions between views */

@@ -179,67 +179,10 @@ function extractSVGViewBox(svgText) {
     return null;
 }
 
-function calculateOptimalViewBox(svgTexts, view) {
-    // Try to extract and merge viewBoxes from all SVG parts
-    const viewBoxes = [];
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    
-    svgTexts.forEach(svgText => {
-        const viewBox = extractSVGViewBox(svgText);
-        if (viewBox) {
-            const [x, y, width, height] = viewBox.split(' ').map(Number);
-            minX = Math.min(minX, x);
-            minY = Math.min(minY, y);
-            maxX = Math.max(maxX, x + width);
-            maxY = Math.max(maxY, y + height);
-            viewBoxes.push({ x, y, width, height });
-        }
-    });
-    
-    // If we found valid viewBoxes, calculate the combined bounds
-    if (viewBoxes.length > 0 && minX !== Infinity) {
-        const totalWidth = maxX - minX;
-        const totalHeight = maxY - minY;
-        
-        // Use consistent padding for both views
-        const padding = 15;
-        const paddedX = minX - padding;
-        const paddedY = minY - padding;
-        const paddedWidth = totalWidth + (padding * 2);
-        const paddedHeight = totalHeight + (padding * 2);
-        
-        // Ensure consistent sizing between views by using a standardized approach
-        const aspectRatio = paddedWidth / paddedHeight;
-        const targetAspectRatio = 0.75; // 3:4 ratio to match container
-        
-        let finalX = paddedX;
-        let finalY = paddedY;
-        let finalWidth = paddedWidth;
-        let finalHeight = paddedHeight;
-        
-        // Adjust to maintain consistent aspect ratio and centering
-        if (aspectRatio > targetAspectRatio) {
-            // Too wide, adjust height and center vertically
-            finalHeight = finalWidth / targetAspectRatio;
-            finalY = paddedY - (finalHeight - paddedHeight) / 2;
-        } else if (aspectRatio < targetAspectRatio) {
-            // Too tall, adjust width and center horizontally
-            finalWidth = finalHeight * targetAspectRatio;
-            finalX = paddedX - (finalWidth - paddedWidth) / 2;
-        }
-        
-        // Round values to avoid sub-pixel issues
-        finalX = Math.round(finalX * 10) / 10;
-        finalY = Math.round(finalY * 10) / 10;
-        finalWidth = Math.round(finalWidth * 10) / 10;
-        finalHeight = Math.round(finalHeight * 10) / 10;
-        
-        return `${finalX} ${finalY} ${finalWidth} ${finalHeight}`;
-    }
-    
-    // Fallback to default configuration
-    return VIEW_CONFIGS[view].viewBox;
-}
+// Note: We use fixed viewBox values instead of dynamic calculation to ensure
+// consistent sizing and positioning between front and back avatar views.
+// Dynamic calculation can lead to different viewBox values for each view,
+// causing inconsistent avatar sizing when switching between views.
 
 async function loadAvatar(view = 'front') {
     const avatarContainer = document.getElementById('avatarDisplay');
