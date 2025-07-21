@@ -73,6 +73,9 @@ function loadUserData() {
             <div class="user-detail">
                 <strong>👁️ Current View:</strong> ${user.avatar.view || 'front'}
             </div>
+            <div class="user-detail">
+                <strong>💪 Arms:</strong> 3-part (Upper + Lower + Hand)
+            </div>
         `;
         console.log('User details loaded successfully');
     } else {
@@ -181,6 +184,17 @@ function showSettingsModal() {
                 </div>
             </div>
             <div class="settings-section">
+                <h3>Avatar Structure</h3>
+                <div class="setting-item">
+                    <label>Arms:</label>
+                    <span>3-part (UpperArm + LowerArm + Hand)</span>
+                </div>
+                <div class="setting-item">
+                    <label>Legs:</label>
+                    <span>3-part (UpperLeg + LowerLeg + Foot)</span>
+                </div>
+            </div>
+            <div class="settings-section">
                 <h3>Account</h3>
                 <div class="setting-item">
                     <label>Username:</label>
@@ -250,26 +264,32 @@ function saveSettings() {
     loadUserData();
 }
 
-// Reset avatar
+// Reset avatar with correct 3-part arm structure
 function resetAvatar() {
     if (confirm('Are you sure you want to reset your avatar to default? This cannot be undone.')) {
         const user = getCurrentUser();
         
-        // Reset avatar to default (no color overrides)
+        // Reset avatar to default with correct 3-part arms (no color overrides)
         user.avatar = {
             view: 'front',
             bodyParts: {
+                // Head
                 head: 'front-body-flesh-Head.svg',
+                // Core body
                 coreBody: 'front-body-flesh-CoreBody.svg',
+                // Left arm (3 parts)
                 leftUpperArm: 'front-body-flesh-LeftUpperArm.svg',
                 leftLowerArm: 'front-body-flesh-LeftLowerArm.svg',
                 leftHand: 'front-body-flesh-LeftHand.svg',
+                // Right arm (3 parts)
                 rightUpperArm: 'front-body-flesh-RightUpperArm.svg',
                 rightLowerArm: 'front-body-flesh-RightLowerArm.svg',
                 rightHand: 'front-body-flesh-RightHand.svg',
+                // Left leg (3 parts)
                 leftUpperLeg: 'front-body-flesh-LeftUpperLeg.svg',
                 leftLowerLeg: 'front-body-flesh-LeftLowerLeg.svg',
                 leftFoot: 'front-body-flesh-LeftFoot.svg',
+                // Right leg (3 parts)
                 rightUpperLeg: 'front-body-flesh-RightUpperLeg.svg',
                 rightLowerLeg: 'front-body-flesh-RightLowerLeg.svg',
                 rightFoot: 'front-body-flesh-RightFoot.svg'
@@ -291,7 +311,7 @@ function resetAvatar() {
         document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById('front-view').classList.add('active');
         
-        showNotification('Avatar reset to default!', 'success');
+        showNotification('Avatar reset to default with 3-part arms!', 'success');
         document.querySelector('.modal-overlay').remove();
         
         // Refresh user details display

@@ -1,4 +1,4 @@
-// Avatar System for Metaverse Application
+// Avatar System for Metaverse Application with Correct 3-Part Arms
 
 class AvatarRenderer {
     constructor() {
@@ -38,34 +38,38 @@ class AvatarRenderer {
         }
     }
 
-    // Get body parts for current view with proper Z-index ordering
+    // Get body parts for current view with proper Z-index ordering for 3-part arms
     getBodyPartsForView(view) {
         const prefix = view === 'front' ? 'front-body-flesh-' : 'back-body-flesh-';
         
-        // Return body parts in proper layering order (bottom to top)
+        // Return body parts in proper layering order (bottom to top) with correct 3-part arms
         return [
-            // Layer 1 (Bottom) - Legs and feet
+            // Layer 1 (Bottom) - Feet
             { name: 'leftFoot', file: `${prefix}LeftFoot.svg`, zIndex: 1 },
             { name: 'rightFoot', file: `${prefix}RightFoot.svg`, zIndex: 1 },
+            
+            // Layer 2 - Lower legs
             { name: 'leftLowerLeg', file: `${prefix}LeftLowerLeg.svg`, zIndex: 2 },
             { name: 'rightLowerLeg', file: `${prefix}RightLowerLeg.svg`, zIndex: 2 },
+            
+            // Layer 3 - Upper legs + Left arm (behind body)
             { name: 'leftUpperLeg', file: `${prefix}LeftUpperLeg.svg`, zIndex: 3 },
             { name: 'rightUpperLeg', file: `${prefix}RightUpperLeg.svg`, zIndex: 3 },
             
-            // Layer 2 - Core body (middle)
-            { name: 'coreBody', file: `${prefix}CoreBody.svg`, zIndex: 4 },
-            
-            // Layer 3 - Arms behind body
+            // Left arm behind body (3 parts)
             { name: 'leftUpperArm', file: `${prefix}LeftUpperArm.svg`, zIndex: 3 },
             { name: 'leftLowerArm', file: `${prefix}LeftLowerArm.svg`, zIndex: 3 },
             { name: 'leftHand', file: `${prefix}LeftHand.svg`, zIndex: 3 },
             
-            // Layer 4 - Arms in front of body
+            // Layer 4 - Core body (main layer)
+            { name: 'coreBody', file: `${prefix}CoreBody.svg`, zIndex: 4 },
+            
+            // Layer 5 - Right arm (in front of body) (3 parts)
             { name: 'rightUpperArm', file: `${prefix}RightUpperArm.svg`, zIndex: 5 },
             { name: 'rightLowerArm', file: `${prefix}RightLowerArm.svg`, zIndex: 5 },
             { name: 'rightHand', file: `${prefix}RightHand.svg`, zIndex: 5 },
             
-            // Layer 5 (Top) - Head
+            // Layer 6 (Top) - Head
             { name: 'head', file: `${prefix}Head.svg`, zIndex: 6 }
         ];
     }
@@ -112,7 +116,7 @@ class AvatarRenderer {
             const svgResults = await Promise.all(svgPromises);
             console.log('All SVG files loaded:', svgResults.length);
 
-            loadingStatus.textContent = 'Assembling avatar...';
+            loadingStatus.textContent = 'Assembling avatar with 3-part arms...';
 
             // Create the avatar display with proper layering
             const avatarDisplay = document.createElement('div');
@@ -174,7 +178,7 @@ class AvatarRenderer {
                 container.appendChild(avatarDisplay);
                 
                 // DO NOT apply color customizations - preserve original SVG colors
-                console.log('Avatar rendering completed successfully with original colors');
+                console.log('Avatar rendering completed successfully with original colors and 3-part arms');
             } else {
                 throw new Error('No body parts could be loaded');
             }
@@ -227,6 +231,7 @@ function initializeAvatar() {
     }
 
     console.log('Initializing avatar for user:', user.username);
+    console.log('Avatar will have 3-part arms: UpperArm + LowerArm + Hand');
     
     // Render the avatar
     avatarRenderer.renderAvatar(container, user.avatar.view || 'front');

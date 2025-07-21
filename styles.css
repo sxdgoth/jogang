@@ -363,7 +363,7 @@ body.home-page {
     overflow: hidden;
 }
 
-/* Avatar Display Styles with Proper Layering */
+/* Avatar Display Styles with Proper Layering for 3-Part Arms */
 .avatar-display {
     position: relative;
     width: 100%;
@@ -385,7 +385,7 @@ body.home-page {
     pointer-events: none;
 }
 
-/* Specific body part positioning and layering */
+/* Specific body part positioning and layering for 3-part arms */
 .body-part-container.leftFoot,
 .body-part-container.rightFoot {
     z-index: 1;

@@ -84,7 +84,7 @@ if (document.getElementById('registerForm')) {
     });
 }
 
-// Registration function
+// Registration function with correct 3-part arm structure
 function register(username, email, password, birthday) {
     // Get existing users from localStorage
     let users = JSON.parse(localStorage.getItem('avatarUsers') || '[]');
@@ -94,7 +94,7 @@ function register(username, email, password, birthday) {
         return false;
     }
     
-    // Create new user object
+    // Create new user object with correct arm structure
     const newUser = {
         id: Date.now(), // Simple ID generation
         username: username,
@@ -106,17 +106,23 @@ function register(username, email, password, birthday) {
         avatar: {
             view: 'front', // default view
             bodyParts: {
+                // Head
                 head: 'front-body-flesh-Head.svg',
+                // Core body
                 coreBody: 'front-body-flesh-CoreBody.svg',
+                // Left arm (3 parts)
                 leftUpperArm: 'front-body-flesh-LeftUpperArm.svg',
                 leftLowerArm: 'front-body-flesh-LeftLowerArm.svg',
                 leftHand: 'front-body-flesh-LeftHand.svg',
+                // Right arm (3 parts)
                 rightUpperArm: 'front-body-flesh-RightUpperArm.svg',
                 rightLowerArm: 'front-body-flesh-RightLowerArm.svg',
                 rightHand: 'front-body-flesh-RightHand.svg',
+                // Left leg (3 parts)
                 leftUpperLeg: 'front-body-flesh-LeftUpperLeg.svg',
                 leftLowerLeg: 'front-body-flesh-LeftLowerLeg.svg',
                 leftFoot: 'front-body-flesh-LeftFoot.svg',
+                // Right leg (3 parts)
                 rightUpperLeg: 'front-body-flesh-RightUpperLeg.svg',
                 rightLowerLeg: 'front-body-flesh-RightLowerLeg.svg',
                 rightFoot: 'front-body-flesh-RightFoot.svg'

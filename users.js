@@ -62,6 +62,7 @@ function createUserCard(user) {
                 <span><strong>Last Login:</strong> ${lastLogin}</span>
                 <span><strong>Avatar View:</strong> ${user.avatar.view}</span>
                 <span><strong>Level:</strong> ${user.stats.level}</span>
+                <span><strong>Arms:</strong> 3-part (Upper+Lower+Hand)</span>
             </div>
         </div>
     `;
@@ -78,6 +79,7 @@ function loadStorageInfo() {
         totalUsers: users.length,
         currentlyLoggedIn: currentUser ? currentUser.username : 'None',
         backupEntries: backups.length,
+        avatarStructure: '3-part arms (UpperArm + LowerArm + Hand)',
         storageKeys: {
             avatarUsers: localStorage.getItem('avatarUsers') ? 'EXISTS' : 'EMPTY',
             userBackups: localStorage.getItem('userBackups') ? 'EXISTS' : 'EMPTY',
