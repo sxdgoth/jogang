@@ -363,7 +363,7 @@ body.home-page {
     overflow: hidden;
 }
 
-/* Avatar Display Styles with Proper Layering for 3-Part Arms */
+/* Avatar Display Styles with CORRECT ARM LAYERING and CONSISTENT SCALING */
 .avatar-display {
     position: relative;
     width: 100%;
@@ -385,7 +385,7 @@ body.home-page {
     pointer-events: none;
 }
 
-/* Specific body part positioning and layering for 3-part arms */
+/* CORRECT ARM LAYERING: Left arm UNDER body, Right arm ON TOP of body */
 .body-part-container.leftFoot,
 .body-part-container.rightFoot {
     z-index: 1;
@@ -396,6 +396,7 @@ body.home-page {
     z-index: 2;
 }
 
+/* LEFT ARM UNDER BODY (z-index 3) */
 .body-part-container.leftUpperLeg,
 .body-part-container.rightUpperLeg,
 .body-part-container.leftUpperArm,
@@ -408,6 +409,7 @@ body.home-page {
     z-index: 4;
 }
 
+/* RIGHT ARM ON TOP OF BODY (z-index 5) */
 .body-part-container.rightUpperArm,
 .body-part-container.rightLowerArm,
 .body-part-container.rightHand {
@@ -425,6 +427,9 @@ body.home-page {
     height: auto;
     /* Preserve original SVG colors */
     color: inherit;
+    /* CONSISTENT SCALING for both front and back views */
+    transform: scale(0.9);
+    transform-origin: center center;
 }
 
 /* Loading Styles */
