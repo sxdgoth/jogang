@@ -68,7 +68,7 @@ class AvatarRenderer {
         this.isLoading = true;
         this.currentView = view;
         const bodyParts = this.getBodyPartsForView(view);
-        
+
         container.innerHTML = `<div class="avatar-loading"><p>Loading avatar...</p></div>`;
 
         try {
@@ -80,16 +80,19 @@ class AvatarRenderer {
             const svgResults = await Promise.all(svgPromises);
             const avatarDisplay = document.createElement('div');
             avatarDisplay.className = 'avatar-display';
-            
+
+            // Add view-specific class for consistent positioning
+            avatarDisplay.classList.add(`avatar-${view}-view`);
+
             // Sort by Z-index for proper layering
             svgResults.sort((a, b) => a.zIndex - b.zIndex);
-            
+
             for (const part of svgResults) {
                 if (part.content && part.content.trim()) {
                     const partContainer = document.createElement('div');
                     partContainer.className = `body-part-container ${part.name}`;
                     partContainer.innerHTML = part.content;
-                    
+
                     partContainer.style.position = 'absolute';
                     partContainer.style.top = '0';
                     partContainer.style.left = '0';
@@ -97,28 +100,35 @@ class AvatarRenderer {
                     partContainer.style.height = '100%';
                     partContainer.style.zIndex = part.zIndex;
                     partContainer.style.pointerEvents = 'none';
-                    
+
                     const svgElement = partContainer.querySelector('svg');
                     if (svgElement) {
+                        // Ensure consistent positioning and scaling
                         svgElement.style.position = 'absolute';
-                        svgElement.style.top = '0';
-                        svgElement.style.left = '0';
+                        svgElement.style.top = '50%';
+                        svgElement.style.left = '50%';
                         svgElement.style.width = '100%';
                         svgElement.style.height = '100%';
                         svgElement.style.objectFit = 'contain';
-                        
-                        // SAME SCALE FOR BOTH FRONT AND BACK VIEW
-                        svgElement.style.transform = 'scale(0.85)';
+
+                        // CONSISTENT TRANSFORM FOR BOTH FRONT AND BACK VIEW
+                        // Center the SVG and apply consistent scaling
+                        svgElement.style.transform = 'translate(-50%, -50%) scale(0.85)';
                         svgElement.style.transformOrigin = 'center center';
+
+                        // Ensure viewBox is preserved for consistent aspect ratio
+                        if (!svgElement.getAttribute('preserveAspectRatio')) {
+                            svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                        }
                     }
-                    
+
                     avatarDisplay.appendChild(partContainer);
                 }
             }
 
             container.innerHTML = '';
             container.appendChild(avatarDisplay);
-            
+
         } catch (error) {
             console.error('Error rendering avatar:', error);
             container.innerHTML = `<div class="avatar-error"><p>Error loading avatar</p></div>`;

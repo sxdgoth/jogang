@@ -371,6 +371,15 @@ body.home-page {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden; /* Prevent any overflow issues */
+}
+
+/* Ensure consistent positioning for both front and back views */
+.avatar-front-view,
+.avatar-back-view {
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .body-part-container {
@@ -421,15 +430,18 @@ body.home-page {
 }
 
 .body-part-container svg {
-    max-width: 90%;
-    max-height: 90%;
-    width: auto;
-    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* CONSISTENT SCALING and CENTERING for both front and back views */
+    transform: translate(-50%, -50%) scale(0.85);
+    transform-origin: center center;
     /* Preserve original SVG colors */
     color: inherit;
-    /* CONSISTENT SCALING for both front and back views */
-    transform: scale(0.9);
-    transform-origin: center center;
 }
 
 /* Loading Styles */

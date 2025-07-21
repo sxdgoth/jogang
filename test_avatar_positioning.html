@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Positioning Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .test-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .test-avatar {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        .test-avatar h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        #test-front-container,
+        #test-back-container {
+            width: 350px;
+            height: 450px;
+            margin: 0 auto 20px;
+            border: 3px solid #e1e5e9;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .comparison-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <h1>Avatar Positioning Test - Front vs Back View</h1>
+    
+    <div class="comparison-note">
+        <strong>Test Purpose:</strong> Verify that front and back view avatars have consistent positioning and scaling.
+        <br>Both avatars should appear in the same position and size within their containers.
+    </div>
+    
+    <div class="test-container">
+        <div class="test-avatar">
+            <h3>Front View</h3>
+            <div id="test-front-container">
+                <div class="avatar-loading">
+                    <p>Loading front view...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-avatar">
+            <h3>Back View</h3>
+            <div id="test-back-container">
+                <div class="avatar-loading">
+                    <p>Loading back view...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="comparison-note">
+        <strong>Expected Result:</strong> Both avatars should be centered and scaled identically within their containers.
+        <br><strong>Issue Fixed:</strong> SVG positioning inconsistencies between front and back views.
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="avatar.js"></script>
+    <script>
+        // Create a test user for demonstration
+        const testUser = {
+            id: 999,
+            username: 'testuser',
+            email: 'test@example.com',
+            password: 'test123',
+            birthday: '1990-01-01',
+            createdAt: new Date().toISOString(),
+            lastLogin: null,
+            avatar: {
+                view: 'front',
+                bodyParts: {},
+                customizations: {
+                    skinColor: null,
+                    items: []
+                }
+            }
+        };
+        
+        // Set test user as current user
+        localStorage.setItem('currentUser', JSON.stringify(testUser));
+        
+        // Test both views when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Starting avatar positioning test...');
+            
+            const frontContainer = document.getElementById('test-front-container');
+            const backContainer = document.getElementById('test-back-container');
+            
+            if (frontContainer && backContainer) {
+                try {
+                    // Render front view
+                    console.log('Rendering front view...');
+                    await avatarRenderer.renderAvatar(frontContainer, 'front');
+                    
+                    // Render back view
+                    console.log('Rendering back view...');
+                    await avatarRenderer.renderAvatar(backContainer, 'back');
+                    
+                    console.log('Avatar positioning test completed!');
+                } catch (error) {
+                    console.error('Error during avatar positioning test:', error);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
