@@ -61,7 +61,7 @@ class AvatarRenderer {
         ];
     }
 
-    // Render avatar
+    // Render avatar with CONSISTENT SCALING for both views
     async renderAvatar(container, view = 'front') {
         if (this.isLoading) return;
 
@@ -106,7 +106,9 @@ class AvatarRenderer {
                         svgElement.style.width = '100%';
                         svgElement.style.height = '100%';
                         svgElement.style.objectFit = 'contain';
-                        svgElement.style.transform = 'scale(0.9)';
+                        
+                        // SAME SCALE FOR BOTH FRONT AND BACK VIEW
+                        svgElement.style.transform = 'scale(0.85)';
                         svgElement.style.transformOrigin = 'center center';
                     }
                     
