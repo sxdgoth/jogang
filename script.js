@@ -34,7 +34,7 @@ const AVATAR_PARTS = {
     }
 };
 
-// ViewBox configurations for different views
+// ViewBox configurations for different views - FIXED to ensure consistency
 const VIEW_CONFIGS = {
     front: {
         viewBox: "-50 -150 100 200",
@@ -42,8 +42,8 @@ const VIEW_CONFIGS = {
         height: "400"
     },
     back: {
-        viewBox: "-50 -150 100 200",
-        width: "300", 
+        viewBox: "-50 -150 100 200", // Same as front to ensure consistent sizing
+        width: "300",
         height: "400"
     }
 };
@@ -277,11 +277,10 @@ async function loadAvatar(view = 'front') {
         
         // Get view configuration
         const config = VIEW_CONFIGS[view];
-        
-        // Calculate optimal viewBox based on all SVG parts
-        // Always recalculate to ensure consistency between views
-        const viewBox = calculateOptimalViewBox(svgTexts, view);
-        console.log(`Calculated viewBox for ${view} view:`, viewBox);
+
+        // Use fixed viewBox to ensure consistent sizing between front and back views
+        const viewBox = config.viewBox;
+        console.log(`Using fixed viewBox for ${view} view:`, viewBox);
         
         // Create combined SVG with proper viewBox for the current view
         const combinedSVG = `
