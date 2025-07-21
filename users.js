@@ -88,26 +88,3 @@ function loadStorageInfo() {
     
     storageDetails.textContent = JSON.stringify(storageInfo, null, 2);
 }
-
-// Add some additional styles for the users page
-const userStyles = document.createElement('style');
-userStyles.textContent = `
-    .no-users {
-        text-align: center;
-        padding: 40px;
-        color: #666;
-    }
-    
-    .no-users h3 {
-        color: #333;
-        margin-bottom: 10px;
-    }
-    
-    .users-list h3 {
-        color: #333;
-        margin-bottom: 20px;
-        text-align: center;
-        font-size: 1.3em;
-    }
-`;
-document.head.appendChild(userStyles);
