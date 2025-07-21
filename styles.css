@@ -248,6 +248,25 @@ body {
     object-fit: contain;
 }
 
+/* Ensure consistent positioning for both views */
+.avatar-display.front-view svg,
+.avatar-display.back-view svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Additional styling for view transitions */
+.avatar-display.front-view {
+    transform: scaleX(1);
+}
+
+.avatar-display.back-view {
+    transform: scaleX(1);
+}
+
 .avatar-controls {
     text-align: center;
 }

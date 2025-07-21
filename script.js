@@ -34,6 +34,20 @@ const AVATAR_PARTS = {
     }
 };
 
+// ViewBox configurations for different views
+const VIEW_CONFIGS = {
+    front: {
+        viewBox: "-50 -150 100 200",
+        width: "300",
+        height: "400"
+    },
+    back: {
+        viewBox: "-50 -150 100 200",
+        width: "300", 
+        height: "400"
+    }
+};
+
 // Application State
 let currentUser = null;
 let currentView = 'front';
@@ -153,6 +167,59 @@ function extractSVGContent(svgText) {
     return '';
 }
 
+function extractSVGViewBox(svgText) {
+    // Extract viewBox from SVG
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgText, 'image/svg+xml');
+    const svgElement = doc.querySelector('svg');
+    
+    if (svgElement) {
+        return svgElement.getAttribute('viewBox');
+    }
+    return null;
+}
+
+function calculateOptimalViewBox(svgContents, view) {
+    // For now, we'll use predefined viewBoxes, but this function can be enhanced
+    // to dynamically calculate the optimal viewBox based on the actual SVG content
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    
+    // Parse each SVG content to find bounding box
+    svgContents.forEach(content => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<svg>${content}</svg>`, 'image/svg+xml');
+        const elements = doc.querySelectorAll('*');
+        
+        elements.forEach(element => {
+            if (element.getBBox) {
+                try {
+                    const bbox = element.getBBox();
+                    minX = Math.min(minX, bbox.x);
+                    minY = Math.min(minY, bbox.y);
+                    maxX = Math.max(maxX, bbox.x + bbox.width);
+                    maxY = Math.max(maxY, bbox.y + bbox.height);
+                } catch (e) {
+                    // getBBox might fail for some elements
+                }
+            }
+        });
+    });
+    
+    // If we couldn't calculate bounds, use default
+    if (minX === Infinity) {
+        return VIEW_CONFIGS[view].viewBox;
+    }
+    
+    // Add some padding
+    const padding = 5;
+    minX -= padding;
+    minY -= padding;
+    const width = (maxX - minX) + (padding * 2);
+    const height = (maxY - minY) + (padding * 2);
+    
+    return `${minX} ${minY} ${width} ${height}`;
+}
+
 async function loadAvatar(view = 'front') {
     const avatarContainer = document.getElementById('avatarDisplay');
     avatarContainer.classList.add('switching');
@@ -161,11 +228,13 @@ async function loadAvatar(view = 'front') {
         // Create a combined SVG with all body parts
         const parts = AVATAR_PARTS[view];
         const svgContents = [];
+        const svgTexts = [];
         
         // Load all SVG parts
         for (const [partName, url] of Object.entries(parts)) {
             const svgContent = await fetchSVGContent(url);
             if (svgContent) {
+                svgTexts.push(svgContent);
                 const content = extractSVGContent(svgContent);
                 if (content) {
                     svgContents.push(content);
@@ -173,20 +242,45 @@ async function loadAvatar(view = 'front') {
             }
         }
         
-        // Create combined SVG
+        // Get view configuration
+        const config = VIEW_CONFIGS[view];
+        let viewBox = config.viewBox;
+        
+        // Collect all viewBoxes from SVG files to find the best fit
+        const viewBoxes = [];
+        svgTexts.forEach(svgText => {
+            const vb = extractSVGViewBox(svgText);
+            if (vb) {
+                viewBoxes.push(vb);
+            }
+        });
+        
+        // If we have viewBoxes, use the first one as it's likely the most representative
+        if (viewBoxes.length > 0) {
+            viewBox = viewBoxes[0];
+            console.log(`Using viewBox for ${view} view:`, viewBox);
+        } else {
+            console.log(`Using default viewBox for ${view} view:`, viewBox);
+        }
+        
+        // Create combined SVG with proper viewBox for the current view
         const combinedSVG = `
             <svg xmlns:xlink="http://www.w3.org/1999/xlink" 
                  xmlns="http://www.w3.org/2000/svg" 
                  aria-label="user avatar" 
-                 viewBox="-40.94377899169922 -146.29818725585938 68.82828521728516 163.4471893310547" 
+                 viewBox="${viewBox}" 
                  preserveAspectRatio="xMidYMid meet" 
-                 width="300" 
-                 height="400">
+                 width="${config.width}" 
+                 height="${config.height}"
+                 style="max-width: 100%; max-height: 100%;">
                 ${svgContents.join('')}
             </svg>
         `;
         
         avatarContainer.innerHTML = combinedSVG;
+        
+        // Add view-specific class for additional styling if needed
+        avatarContainer.className = `avatar-display ${view}-view`;
         
     } catch (error) {
         console.error('Error loading avatar:', error);
