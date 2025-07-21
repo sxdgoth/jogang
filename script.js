@@ -52,6 +52,7 @@ const VIEW_CONFIGS = {
 let currentUser = null;
 let currentView = 'front';
 let avatarCache = {};
+let viewBoxCache = {};
 
 // DOM Elements
 const loginForm = document.getElementById('loginForm');
@@ -179,45 +180,32 @@ function extractSVGViewBox(svgText) {
     return null;
 }
 
-function calculateOptimalViewBox(svgContents, view) {
-    // For now, we'll use predefined viewBoxes, but this function can be enhanced
-    // to dynamically calculate the optimal viewBox based on the actual SVG content
+function calculateOptimalViewBox(svgTexts, view) {
+    // Try to extract and merge viewBoxes from all SVG parts
+    const viewBoxes = [];
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     
-    // Parse each SVG content to find bounding box
-    svgContents.forEach(content => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(`<svg>${content}</svg>`, 'image/svg+xml');
-        const elements = doc.querySelectorAll('*');
-        
-        elements.forEach(element => {
-            if (element.getBBox) {
-                try {
-                    const bbox = element.getBBox();
-                    minX = Math.min(minX, bbox.x);
-                    minY = Math.min(minY, bbox.y);
-                    maxX = Math.max(maxX, bbox.x + bbox.width);
-                    maxY = Math.max(maxY, bbox.y + bbox.height);
-                } catch (e) {
-                    // getBBox might fail for some elements
-                }
-            }
-        });
+    svgTexts.forEach(svgText => {
+        const viewBox = extractSVGViewBox(svgText);
+        if (viewBox) {
+            const [x, y, width, height] = viewBox.split(' ').map(Number);
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x + width);
+            maxY = Math.max(maxY, y + height);
+            viewBoxes.push({ x, y, width, height });
+        }
     });
     
-    // If we couldn't calculate bounds, use default
-    if (minX === Infinity) {
-        return VIEW_CONFIGS[view].viewBox;
+    // If we found valid viewBoxes, calculate the combined bounds
+    if (viewBoxes.length > 0 && minX !== Infinity) {
+        const totalWidth = maxX - minX;
+        const totalHeight = maxY - minY;
+        return `${minX} ${minY} ${totalWidth} ${totalHeight}`;
     }
     
-    // Add some padding
-    const padding = 5;
-    minX -= padding;
-    minY -= padding;
-    const width = (maxX - minX) + (padding * 2);
-    const height = (maxY - minY) + (padding * 2);
-    
-    return `${minX} ${minY} ${width} ${height}`;
+    // Fallback to default configuration
+    return VIEW_CONFIGS[view].viewBox;
 }
 
 async function loadAvatar(view = 'front') {
@@ -244,24 +232,10 @@ async function loadAvatar(view = 'front') {
         
         // Get view configuration
         const config = VIEW_CONFIGS[view];
-        let viewBox = config.viewBox;
         
-        // Collect all viewBoxes from SVG files to find the best fit
-        const viewBoxes = [];
-        svgTexts.forEach(svgText => {
-            const vb = extractSVGViewBox(svgText);
-            if (vb) {
-                viewBoxes.push(vb);
-            }
-        });
-        
-        // If we have viewBoxes, use the first one as it's likely the most representative
-        if (viewBoxes.length > 0) {
-            viewBox = viewBoxes[0];
-            console.log(`Using viewBox for ${view} view:`, viewBox);
-        } else {
-            console.log(`Using default viewBox for ${view} view:`, viewBox);
-        }
+        // Calculate optimal viewBox based on all SVG parts
+        const viewBox = calculateOptimalViewBox(svgTexts, view);
+        console.log(`Using viewBox for ${view} view:`, viewBox);
         
         // Create combined SVG with proper viewBox for the current view
         const combinedSVG = `
