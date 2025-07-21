@@ -255,7 +255,7 @@ function resetAvatar() {
     if (confirm('Are you sure you want to reset your avatar to default? This cannot be undone.')) {
         const user = getCurrentUser();
         
-        // Reset avatar to default
+        // Reset avatar to default (no color overrides)
         user.avatar = {
             view: 'front',
             bodyParts: {
@@ -275,7 +275,7 @@ function resetAvatar() {
                 rightFoot: 'front-body-flesh-RightFoot.svg'
             },
             customizations: {
-                skinColor: '#FDBCB4',
+                skinColor: null, // Don't override original colors
                 items: []
             }
         };

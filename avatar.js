@@ -38,28 +38,39 @@ class AvatarRenderer {
         }
     }
 
-    // Get body parts for current view
+    // Get body parts for current view with proper Z-index ordering
     getBodyPartsForView(view) {
         const prefix = view === 'front' ? 'front-body-flesh-' : 'back-body-flesh-';
+        
+        // Return body parts in proper layering order (bottom to top)
         return [
-            `${prefix}Head.svg`,
-            `${prefix}CoreBody.svg`,
-            `${prefix}LeftUpperArm.svg`,
-            `${prefix}LeftLowerArm.svg`,
-            `${prefix}LeftHand.svg`,
-            `${prefix}RightUpperArm.svg`,
-            `${prefix}RightLowerArm.svg`,
-            `${prefix}RightHand.svg`,
-            `${prefix}LeftUpperLeg.svg`,
-            `${prefix}LeftLowerLeg.svg`,
-            `${prefix}LeftFoot.svg`,
-            `${prefix}RightUpperLeg.svg`,
-            `${prefix}RightLowerLeg.svg`,
-            `${prefix}RightFoot.svg`
+            // Layer 1 (Bottom) - Legs and feet
+            { name: 'leftFoot', file: `${prefix}LeftFoot.svg`, zIndex: 1 },
+            { name: 'rightFoot', file: `${prefix}RightFoot.svg`, zIndex: 1 },
+            { name: 'leftLowerLeg', file: `${prefix}LeftLowerLeg.svg`, zIndex: 2 },
+            { name: 'rightLowerLeg', file: `${prefix}RightLowerLeg.svg`, zIndex: 2 },
+            { name: 'leftUpperLeg', file: `${prefix}LeftUpperLeg.svg`, zIndex: 3 },
+            { name: 'rightUpperLeg', file: `${prefix}RightUpperLeg.svg`, zIndex: 3 },
+            
+            // Layer 2 - Core body (middle)
+            { name: 'coreBody', file: `${prefix}CoreBody.svg`, zIndex: 4 },
+            
+            // Layer 3 - Arms behind body
+            { name: 'leftUpperArm', file: `${prefix}LeftUpperArm.svg`, zIndex: 3 },
+            { name: 'leftLowerArm', file: `${prefix}LeftLowerArm.svg`, zIndex: 3 },
+            { name: 'leftHand', file: `${prefix}LeftHand.svg`, zIndex: 3 },
+            
+            // Layer 4 - Arms in front of body
+            { name: 'rightUpperArm', file: `${prefix}RightUpperArm.svg`, zIndex: 5 },
+            { name: 'rightLowerArm', file: `${prefix}RightLowerArm.svg`, zIndex: 5 },
+            { name: 'rightHand', file: `${prefix}RightHand.svg`, zIndex: 5 },
+            
+            // Layer 5 (Top) - Head
+            { name: 'head', file: `${prefix}Head.svg`, zIndex: 6 }
         ];
     }
 
-    // Render complete avatar with improved loading
+    // Render complete avatar with proper layering and original colors
     async renderAvatar(container, view = 'front') {
         if (this.isLoading) {
             console.log('Avatar is already loading, skipping...');
@@ -71,7 +82,7 @@ class AvatarRenderer {
         const bodyParts = this.getBodyPartsForView(view);
         
         console.log(`Starting to render avatar in ${view} view`);
-        console.log('Body parts to load:', bodyParts);
+        console.log('Body parts to load:', bodyParts.map(p => p.file));
         
         // Show loading with progress
         container.innerHTML = `
@@ -90,12 +101,12 @@ class AvatarRenderer {
             
             // Load all SVG files
             loadingStatus.textContent = 'Loading body parts...';
-            const svgPromises = bodyParts.map(async (filename, index) => {
-                const svgContent = await this.loadSVG(filename);
+            const svgPromises = bodyParts.map(async (part, index) => {
+                const svgContent = await this.loadSVG(part.file);
                 const progress = ((index + 1) / bodyParts.length) * 100;
                 progressBar.style.width = `${progress}%`;
-                loadingStatus.textContent = `Loading ${filename}... (${index + 1}/${bodyParts.length})`;
-                return { filename, content: svgContent };
+                loadingStatus.textContent = `Loading ${part.file}... (${index + 1}/${bodyParts.length})`;
+                return { ...part, content: svgContent };
             });
 
             const svgResults = await Promise.all(svgPromises);
@@ -103,22 +114,34 @@ class AvatarRenderer {
 
             loadingStatus.textContent = 'Assembling avatar...';
 
-            // Create the avatar display
+            // Create the avatar display with proper layering
             const avatarDisplay = document.createElement('div');
             avatarDisplay.className = 'avatar-display';
             
             let successfulLoads = 0;
             
-            // Process each SVG
-            for (const { filename, content } of svgResults) {
-                if (content && content.trim()) {
+            // Sort by Z-index to ensure proper layering
+            svgResults.sort((a, b) => a.zIndex - b.zIndex);
+            
+            // Process each SVG with proper layering
+            for (const part of svgResults) {
+                if (part.content && part.content.trim()) {
                     try {
                         // Create a container for this body part
                         const partContainer = document.createElement('div');
-                        partContainer.className = `body-part-container ${filename.replace('.svg', '')}`;
-                        partContainer.innerHTML = content;
+                        partContainer.className = `body-part-container ${part.name}`;
+                        partContainer.innerHTML = part.content;
                         
-                        // Style the SVG
+                        // Style the container with proper Z-index
+                        partContainer.style.position = 'absolute';
+                        partContainer.style.top = '0';
+                        partContainer.style.left = '0';
+                        partContainer.style.width = '100%';
+                        partContainer.style.height = '100%';
+                        partContainer.style.zIndex = part.zIndex;
+                        partContainer.style.pointerEvents = 'none';
+                        
+                        // Style the SVG to preserve original colors
                         const svgElement = partContainer.querySelector('svg');
                         if (svgElement) {
                             svgElement.style.position = 'absolute';
@@ -126,17 +149,20 @@ class AvatarRenderer {
                             svgElement.style.left = '0';
                             svgElement.style.width = '100%';
                             svgElement.style.height = '100%';
-                            svgElement.style.zIndex = successfulLoads;
+                            svgElement.style.objectFit = 'contain';
+                            
+                            // Preserve original SVG colors - don't override them
+                            svgElement.style.color = 'inherit';
                         }
                         
                         avatarDisplay.appendChild(partContainer);
                         successfulLoads++;
-                        console.log(`Successfully added ${filename} to avatar`);
+                        console.log(`Successfully added ${part.file} to avatar with z-index ${part.zIndex}`);
                     } catch (error) {
-                        console.error(`Error processing ${filename}:`, error);
+                        console.error(`Error processing ${part.file}:`, error);
                     }
                 } else {
-                    console.warn(`No content for ${filename}`);
+                    console.warn(`No content for ${part.file}`);
                 }
             }
 
@@ -147,10 +173,8 @@ class AvatarRenderer {
                 container.innerHTML = '';
                 container.appendChild(avatarDisplay);
                 
-                // Apply customizations
-                this.applyCustomizations(container);
-                
-                console.log('Avatar rendering completed successfully');
+                // DO NOT apply color customizations - preserve original SVG colors
+                console.log('Avatar rendering completed successfully with original colors');
             } else {
                 throw new Error('No body parts could be loaded');
             }
@@ -167,25 +191,6 @@ class AvatarRenderer {
             `;
         } finally {
             this.isLoading = false;
-        }
-    }
-
-    // Apply user customizations
-    applyCustomizations(container) {
-        const user = getCurrentUser();
-        if (!user || !user.avatar.customizations) return;
-
-        const { skinColor } = user.avatar.customizations;
-        
-        if (skinColor) {
-            // Apply skin color to all flesh parts
-            const bodyParts = container.querySelectorAll('path, circle, ellipse, rect');
-            bodyParts.forEach(part => {
-                const currentFill = part.getAttribute('fill');
-                if (currentFill && (currentFill.toLowerCase().includes('#f') || currentFill.toLowerCase().includes('flesh'))) {
-                    part.setAttribute('fill', skinColor);
-                }
-            });
         }
     }
 

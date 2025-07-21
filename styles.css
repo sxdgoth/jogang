@@ -363,7 +363,7 @@ body.home-page {
     overflow: hidden;
 }
 
-/* Avatar Display Styles */
+/* Avatar Display Styles with Proper Layering */
 .avatar-display {
     position: relative;
     width: 100%;
@@ -382,6 +382,40 @@ body.home-page {
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: none;
+}
+
+/* Specific body part positioning and layering */
+.body-part-container.leftFoot,
+.body-part-container.rightFoot {
+    z-index: 1;
+}
+
+.body-part-container.leftLowerLeg,
+.body-part-container.rightLowerLeg {
+    z-index: 2;
+}
+
+.body-part-container.leftUpperLeg,
+.body-part-container.rightUpperLeg,
+.body-part-container.leftUpperArm,
+.body-part-container.leftLowerArm,
+.body-part-container.leftHand {
+    z-index: 3;
+}
+
+.body-part-container.coreBody {
+    z-index: 4;
+}
+
+.body-part-container.rightUpperArm,
+.body-part-container.rightLowerArm,
+.body-part-container.rightHand {
+    z-index: 5;
+}
+
+.body-part-container.head {
+    z-index: 6;
 }
 
 .body-part-container svg {
@@ -389,6 +423,8 @@ body.home-page {
     max-height: 90%;
     width: auto;
     height: auto;
+    /* Preserve original SVG colors */
+    color: inherit;
 }
 
 /* Loading Styles */

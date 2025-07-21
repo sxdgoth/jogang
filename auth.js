@@ -122,7 +122,7 @@ function register(username, email, password, birthday) {
                 rightFoot: 'front-body-flesh-RightFoot.svg'
             },
             customizations: {
-                skinColor: '#FDBCB4',
+                skinColor: null, // Don't override original colors
                 items: []
             }
         },
